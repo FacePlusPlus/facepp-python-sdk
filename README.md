@@ -8,10 +8,10 @@ This is an interactive command line tool which could be used to experiment
 with Face++ APIs. It is recommended to have ipython installed so that you can
 have tab-completion and some other nice features.
 
-Please put your API key/secret in apikey.cfg before starting this program.
-Then you can write something like
+First please put your API key/secret in apikey.cfg. Then you can start the program
+and you will drop into a python shell, where you can write something like:
 
-    `api.detection.detect(img = File(r'<path to the image file>'))`
+    api.detection.detect(img = File(r'<path to the image file>'))
 
 Note that `api` here is a global variable.
 
