@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # $File: facepp.py
-# $Date: Wed Oct 24 23:42:56 2012 +0800
+# $Date: Mon Dec 10 15:46:15 2012 +0800
 # $Author: jiakai@megvii.com
 #
 # This program is free software. It comes without any warranty, to
@@ -28,9 +28,13 @@ example:
 api = API(key, secret)
 api.detection.detect(img = File('/tmp/test.jpg'))"""
 
-__all__ = ['File', 'APIError', 'API', 'wait_async']
+__all__ = ['File', 'APIError', 'API']
 
 
+DEBUG_LEVEL = 0
+
+import sys
+import socket
 import urllib
 import urllib2
 import json
@@ -43,6 +47,7 @@ from collections import Iterable
 from cStringIO import StringIO
 
 class File(object):
+    """an object representing a local file"""
     path = None
     def __init__(self, path):
         self.path = path
@@ -74,13 +79,30 @@ class API(object):
     server = 'http://api.faceplusplus.com/'
 
     decode_result = True
-    """whether to json decode the result"""
+    timeout = None
+    max_retries = None
+    retry_delay = None
 
-    def __init__(self, key, secret, srv = None):
+    def __init__(self, key, secret, srv = None,
+            decode_result = True, timeout = 10, max_retries = 10,
+            retry_delay = 5):
+        """:param srv: The API server address
+        :param decode_result: whether to json_decode the result
+        :param timeout: HTTP request timeout in seconds
+        :param max_retries: maximal number of retries after catching URL error
+            or socket error
+        :param retry_delay: time to sleep before retrying"""
         self.key = key
         self.secret = secret
         if srv:
             self.server = srv
+        self.decode_result = decode_result
+        assert timeout >= 0 or timeout is None
+        assert max_retries >= 0
+        self.timeout = timeout
+        self.max_retries = max_retries
+        self.retry_delay = retry_delay
+
         _setup_apiobj(self, self, [])
 
     def wait_async(self, session_id, referesh_interval = 2):
@@ -134,10 +156,19 @@ class _APIProxy(object):
             request.add_header('Content-length', str(len(body)))
             request.add_data(body)
 
-        try:
-            ret = urllib2.urlopen(request).read()
-        except urllib2.HTTPError as e:
-            raise APIError(e.code, url, e.read())
+        retry = self._api.max_retries
+        while True:
+            retry -= 1
+            try:
+                ret = urllib2.urlopen(request, timeout = self._api.timeout).read()
+                break
+            except (socket.error, urllib2.URLError) as e:
+                if retry < 0:
+                    raise e
+                _print_debug('caught error: {}; retrying'.format(e))
+                time.sleep(self._api.retry_delay)
+            except urllib2.HTTPError as e:
+                raise APIError(e.code, url, e.read())
 
         if self._api.decode_result:
             try:
@@ -234,6 +265,10 @@ class _MultiPartForm(object):
         flattened.append('')
         return '\r\n'.join(flattened)
 
+
+def _print_debug(msg):
+    if DEBUG_LEVEL:
+        sys.stderr.write(msg + '\n')
 
 _APIS = [
     '/detection/detect',
