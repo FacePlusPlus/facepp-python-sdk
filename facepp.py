@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # $File: facepp.py
-# $Date: Mon Dec 10 15:46:15 2012 +0800
+# $Date: Thu Dec 13 22:22:14 2012 +0800
 # $Author: jiakai@megvii.com
 #
 # This program is free software. It comes without any warranty, to
@@ -162,13 +162,13 @@ class _APIProxy(object):
             try:
                 ret = urllib2.urlopen(request, timeout = self._api.timeout).read()
                 break
+            except urllib2.HTTPError as e:
+                raise APIError(e.code, url, e.read())
             except (socket.error, urllib2.URLError) as e:
                 if retry < 0:
                     raise e
                 _print_debug('caught error: {}; retrying'.format(e))
                 time.sleep(self._api.retry_delay)
-            except urllib2.HTTPError as e:
-                raise APIError(e.code, url, e.read())
 
         if self._api.decode_result:
             try:
