@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # $File: facepp.py
-# $Date: Thu Dec 13 22:22:14 2012 +0800
+# $Date: Thu Dec 13 23:11:13 2012 +0800
 # $Author: jiakai@megvii.com
 #
 # This program is free software. It comes without any warranty, to
@@ -84,7 +84,7 @@ class API(object):
     retry_delay = None
 
     def __init__(self, key, secret, srv = None,
-            decode_result = True, timeout = 10, max_retries = 10,
+            decode_result = True, timeout = 30, max_retries = 10,
             retry_delay = 5):
         """:param srv: The API server address
         :param decode_result: whether to json_decode the result
