@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # $File: facepp.py
-# $Date: Thu Dec 13 23:11:13 2012 +0800
+# $Date: Mon Dec 17 14:47:27 2012 +0800
 # $Author: jiakai@megvii.com
 #
 # This program is free software. It comes without any warranty, to
@@ -113,6 +113,11 @@ class API(object):
                 return rst
             time.sleep(referesh_interval)
 
+    def update_request(self, request):
+        """overwrite this function to update the request before sending it to
+        server"""
+        pass
+
 
 def _setup_apiobj(self, api, path):
     if self is not api:
@@ -155,6 +160,8 @@ class _APIProxy(object):
             request.add_header('Content-type', form.get_content_type())
             request.add_header('Content-length', str(len(body)))
             request.add_data(body)
+
+        self._api.update_request(request)
 
         retry = self._api.max_retries
         while True:
