@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # $File: facepp.py
-# $Date: Mon Jan 14 20:52:58 2013 +0800
+# $Date: Mon Jan 14 20:57:00 2013 +0800
 # $Author: jiakai@megvii.com
 #
 # This program is free software. It comes without any warranty, to
@@ -299,7 +299,7 @@ class _MultiPartForm(object):
 
 def _print_debug(msg):
     if DEBUG_LEVEL:
-        sys.stderr.write(msg + '\n')
+        sys.stderr.write(str(msg) + '\n')
 
 _APIS = [
     '/detection/detect',
