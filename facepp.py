@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # $File: facepp.py
-# $Date: Mon Jan 14 17:08:53 2013 +0800
+# $Date: Mon Jan 14 20:52:58 2013 +0800
 # $Author: jiakai@megvii.com
 #
 # This program is free software. It comes without any warranty, to
@@ -119,6 +119,7 @@ class API(object):
             rst = self.info.get_session(session_id = session_id)
             if rst['status'] != u'INQUEUE':
                 return rst
+            _print_debug(rst)
             time.sleep(referesh_interval)
 
     def update_request(self, request):
