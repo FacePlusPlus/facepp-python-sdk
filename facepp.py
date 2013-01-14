@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # $File: facepp.py
-# $Date: Mon Dec 17 14:47:27 2012 +0800
+# $Date: Mon Jan 14 17:08:53 2013 +0800
 # $Author: jiakai@megvii.com
 #
 # This program is free software. It comes without any warranty, to
@@ -51,6 +51,14 @@ class File(object):
     path = None
     def __init__(self, path):
         self.path = path
+
+    def get_content(self):
+        with open(self.path, 'rb') as f:
+            return f.read()
+
+    def get_filename(self):
+        return self.path
+
 
 class APIError(Exception):
     code = None
@@ -143,18 +151,27 @@ class _APIProxy(object):
     def __init__(self, api, path):
         _setup_apiobj(self, api, path)
 
-    def __call__(self, *args, **kargs):
+    def __call__(self, post = False, *args, **kargs):
         if len(args):
             raise TypeError('Only keyword arguments are allowed')
-        url = self.geturl(**kargs)
-        request = urllib2.Request(url)
+        if type(post) is not bool:
+            raise TypeError('post argument can only be True or False')
         form = _MultiPartForm()
         add_form = False
         for (k, v) in kargs.iteritems():
             if isinstance(v, File):
                 add_form = True
-                with open(v.path, 'rb') as f:
-                    form.add_file(k, v.path, f)
+                form.add_file(k, v.get_filename(), v.get_content())
+
+        if post:
+            url = self._urlbase
+            for k, v in self._mkarg(kargs).iteritems():
+                form.add_field(k, v)
+            add_form = True
+        else:
+            url = self.geturl(**kargs)
+
+        request = urllib2.Request(url)
         if add_form:
             body = str(form)
             request.add_header('Content-type', form.get_content_type())
@@ -184,12 +201,14 @@ class _APIProxy(object):
                 raise APIError(-1, url, 'json decode error, value={0!r}'.format(ret))
         return ret
 
-    def geturl(self, **kargs):
-        """return the request url"""
+    def _mkarg(self, kargs):
+        """change the argument list (encode value, add api key/secret)
+        :return: the new argument list"""
         def enc(x):
             if isinstance(x, unicode):
                 return x.encode('utf-8')
             return str(x)
+
         kargs = kargs.copy()
         kargs['api_key'] = self._api.key
         kargs['api_secret'] = self._api.secret
@@ -200,7 +219,12 @@ class _APIProxy(object):
                 del kargs[k]
             else:
                 kargs[k] = enc(v)
-        return self._urlbase + '?' + urllib.urlencode(kargs) 
+
+        return kargs
+
+    def geturl(self, **kargs):
+        """return the request url"""
+        return self._urlbase + '?' + urllib.urlencode(self._mkarg(kargs)) 
 
     def visit(self, browser = 'chromium', **kargs):
         """visit the url in browser"""
@@ -226,12 +250,11 @@ class _MultiPartForm(object):
         self.form_fields.append((name, value))
         return
 
-    def add_file(self, fieldname, filename, fileHandle, mimetype=None):
+    def add_file(self, fieldname, filename, content, mimetype = None):
         """Add a file to be uploaded."""
-        body = fileHandle.read()
         if mimetype is None:
             mimetype = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
-        self.files.append((fieldname, filename, mimetype, body))
+        self.files.append((fieldname, filename, mimetype, content))
         return
     
     def __str__(self):
@@ -307,6 +330,7 @@ _APIS = [
     '/recognition/verify',
     '/recognition/recognize',
     '/recognition/search',
+    '/recognition/grouping',
 ]
 
 _APIS = [i.split('/')[1:] for i in _APIS]
