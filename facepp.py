@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # $File: facepp.py
-# $Date: Mon Jan 14 20:57:00 2013 +0800
+# $Date: Tue Jan 15 11:19:41 2013 +0800
 # $Author: jiakai@megvii.com
 #
 # This program is free software. It comes without any warranty, to
@@ -331,7 +331,8 @@ _APIS = [
     '/recognition/verify',
     '/recognition/recognize',
     '/recognition/search',
-    '/recognition/grouping',
+
+    '/grouping/grouping',
 ]
 
 _APIS = [i.split('/')[1:] for i in _APIS]
