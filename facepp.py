@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # $File: facepp.py
-# $Date: Tue Jan 15 11:19:41 2013 +0800
+# $Date: Fri Apr 05 17:29:44 2013 +0800
 # $Author: jiakai@megvii.com
 #
 # This program is free software. It comes without any warranty, to
@@ -31,7 +31,7 @@ api.detection.detect(img = File('/tmp/test.jpg'))"""
 __all__ = ['File', 'APIError', 'API']
 
 
-DEBUG_LEVEL = 0
+DEBUG_LEVEL = 1
 
 import sys
 import socket
@@ -302,37 +302,47 @@ def _print_debug(msg):
         sys.stderr.write(str(msg) + '\n')
 
 _APIS = [
-    '/detection/detect',
-
-    '/info/get_image',
-    '/info/get_face',
-    '/info/get_session',
-    '/info/get_quota',
-    '/info/get_person_list',
-    '/info/get_group_list',
-    '/info/get_app',
-
-    '/person/create',
-    '/person/delete',
-    '/person/add_face',
-    '/person/remove_face',
-    '/person/get_info',
-    '/person/set_info',
-
-    '/group/create',
-    '/group/delete',
-    '/group/add_person',
-    '/group/remove_person',
-    '/group/get_info',
-    '/group/set_info',
-
-    '/recognition/compare',
-    '/recognition/train',
-    '/recognition/verify',
-    '/recognition/recognize',
-    '/recognition/search',
-
-    '/grouping/grouping',
+  '/detection/detect',
+  '/faceset/add_face',
+  '/faceset/create',
+  '/faceset/delete',
+  '/faceset/get_info',
+  '/faceset/remove_face',
+  '/faceset/set_info',
+  '/group/add_person',
+  '/group/create',
+  '/group/delete',
+  '/group/get_info',
+  '/group/remove_person',
+  '/group/set_info',
+  '/grouping/grouping',
+  '/info/get_app',
+  '/info/get_face',
+  '/info/get_faceset_list',
+  '/info/get_group_list',
+  '/info/get_image',
+  '/info/get_person_list',
+  '/info/get_quota',
+  '/info/get_session',
+  '/person/add_face',
+  '/person/create',
+  '/person/delete',
+  '/person/get_info',
+  '/person/remove_face',
+  '/person/set_info',
+  '/recognition/compare',
+  '/recognition/group_search',
+  '/recognition/identify',
+  '/recognition/recognize',
+  '/recognition/search',
+  '/recognition/test_train',
+  '/recognition/train',
+  '/recognition/verify',
+  '/train/group_search',
+  '/train/identify',
+  '/train/recognize',
+  '/train/search',
+  '/train/verify'
 ]
 
 _APIS = [i.split('/')[1:] for i in _APIS]
