@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # $File: cmdtool.py
-# $Date: Sat Apr 06 11:47:10 2013 +0800
+# $Date: Sat Apr 06 15:42:43 2013 +0800
 # $Author: jiakai@megvii.com
 #
 # This program is free software. It comes without any warranty, to
@@ -36,6 +36,7 @@ def init():
             sys.frozen in ("windows_exe", "console_exe"):
         fdir = os.path.dirname(os.path.abspath(sys.executable))
         sys.path.append(fdir)
+        fdir = os.path.join(fdir, '..')
     else:
         fdir = os.path.dirname(__file__)
 
