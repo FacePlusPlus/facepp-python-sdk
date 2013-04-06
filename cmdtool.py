@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # $File: cmdtool.py
-# $Date: Sat Nov 17 14:14:38 2012 +0800
+# $Date: Sat Apr 06 11:47:10 2013 +0800
 # $Author: jiakai@megvii.com
 #
 # This program is free software. It comes without any warranty, to
@@ -42,8 +42,9 @@ def init():
     with open(os.path.join(fdir, 'apikey.cfg')) as f:
         exec(f.read())
 
+    srv = locals().get('SERVER')
     from facepp import API
-    return API(API_KEY, API_SECRET)
+    return API(API_KEY, API_SECRET, srv = srv)
 
 api = init()
 
