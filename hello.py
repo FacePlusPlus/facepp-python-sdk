@@ -12,9 +12,6 @@
 API_KEY = '<your API key here>'
 API_SECRET = '<your API secret here>'
 
-API_KEY = 'dc3a43c29d3ebc797f0384cb7b58824e'
-API_SECRET = 'oaI3q6uFOenLp-Zv99bsVq4oQf5UhfiJ'
-
 # Import system libraries and define helper functions
 # 导入系统库并定义辅助函数
 import time
