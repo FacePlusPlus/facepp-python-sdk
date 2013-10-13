@@ -12,6 +12,9 @@
 API_KEY = '<your API key here>'
 API_SECRET = '<your API secret here>'
 
+API_KEY = 'dc3a43c29d3ebc797f0384cb7b58824e'
+API_SECRET = 'oaI3q6uFOenLp-Zv99bsVq4oQf5UhfiJ'
+
 # Import system libraries and define helper functions
 # 导入系统库并定义辅助函数
 import time
@@ -37,70 +40,61 @@ api = API(API_KEY, API_SECRET)
 
 # Here are the person names and their face images
 # 人名及其脸部图片
+IMAGE_DIR = \
+  'http://cn.faceplusplus.com/wp-content/themes/faceplusplus.zh/assets/img/demo/'
 PERSONS = [
-    ('Brad Pitt', 'http://www.faceplusplus.com/static/img/demo/9.jpg'),
-    ('Nicolas Cage', 'http://www.faceplusplus.com/static/img/demo/7.jpg'),
-    ('Jackie Chan', 'http://www.faceplusplus.com/static/img/demo/6.jpg')
+    ('Jim Parsons', IMAGE_DIR + 'hello-0.jpg'),
+    ('Leonardo DiCaprio', IMAGE_DIR + 'hello-1.jpg'),
+    ('Andy Liu', IMAGE_DIR + 'hello-2.jpg')
 ]
-TARGET_IMAGE = 'http://www.faceplusplus.com/static/img/demo/13.jpg'
+TARGET_IMAGE = IMAGE_DIR + 'hello-t.jpg'
 
-# Step 1: Create a group to add these persons in
-# 步骤1： 新建一个group用以添加person
-api.group.create(group_name = 'test')
+# Step 1: Detect faces in the 3 pictures and find out their positions and
+# attributes
+# 步骤1：检测出三张输入图片中的Face，找出图片中Face的位置及属性
 
-# Step 2: Detect faces from those three images and add them to the persons
-# 步骤2：从三种图片中检测人脸并将其加入person中。 
-for (name, url) in PERSONS:
-    result = api.detection.detect(url = url, mode = 'oneface')
-    print_result('Detection result for {}:'.format(name), result)
+FACES = {name: api.detection.detect(url = url)
+        for name, url in PERSONS}
 
-    face_id = result['face'][0]['face_id'] 
-
-    # Create a person in the group, and add the face to the person
-    # 在该group中新建一个person，并将face加入期中
-    api.person.create(person_name = name, group_name = 'test',
-            face_id = face_id)
+for name, face in FACES.iteritems():
+    print_result(name, face)
 
 
-# Step 3: Train the group.
-# Note: this step is required before performing recognition in this group,
-# since our system needs to pre-compute models for these persons
-# 步骤3：训练这个group
-# 注：在group中进行识别之前必须执行该步骤，以便我们的系统能为这些person建模
-result = api.recognition.train(group_name = 'test', type = 'all')
+# Step 2: create persons using the face_id
+# 步骤2：引用face_id，创建新的person
+for name, face in FACES.iteritems():
+    rst = api.person.create(
+            person_name = name, face_id = face['face'][0]['face_id'])
+    print_result('create person {}'.format(name), rst)
 
-# Because the train process is time-consuming, the operation is done
-# asynchronously, so only a session ID would be returned.
-# 由于训练过程比较耗时，所以操作必须异步完成，因此只有session ID会被返回
-print_result('Train result:', result)
+# Step 3: create a new group and add those persons in it
+# 步骤3：.创建Group，将之前创建的Person加入这个Group
+rst = api.group.create(group_name = 'test')
+print_result('create group', rst)
+rst = api.group.add_person(group_name = 'test', person_name = FACES.iterkeys())
+print_result('add these persons to group', rst)
 
-session_id = result['session_id']
-
-# Now, wait before train completes
+# Step 4: train the model
+# 步骤4：训练模型
+rst = api.train.identify(group_name = 'test')
+print_result('train', rst)
+# wait for training to complete
 # 等待训练完成
-while True:
-    result = api.info.get_session(session_id = session_id)
-    if result['status'] == u'SUCC':
-        print_result('Async train result:', result)
-        break
-    time.sleep(1)
+rst = api.wait_async(rst['session_id'])
+print_result('wait async', rst)
 
-#也可以通过调用api.wait_async(session_id)函数完成以上功能
-
-
-# Step 4: recognize the unknown face image
-# 步骤4：识别未知脸部图片
-result = api.recognition.recognize(url = TARGET_IMAGE, group_name = 'test')
-print_result('Recognize result:', result)
+# Step 5: recognize face in a new image
+# 步骤5：识别新图中的Face
+rst = api.recognition.identify(group_name = 'test', url = TARGET_IMAGE)
+print_result('recognition result', rst)
 print '=' * 60
 print 'The person with highest confidence:', \
-        result['face'][0]['candidate'][0]['person_name']
-
+        rst['face'][0]['candidate'][0]['person_name']
 
 # Finally, delete the persons and group because they are no longer needed
 # 最终，删除无用的person和group
 api.group.delete(group_name = 'test')
-api.person.delete(person_name = [i[0] for i in PERSONS])
+api.person.delete(person_name = FACES.iterkeys())
 
 # Congratulations! You have finished this tutorial, and you can continue
 # reading our API document and start writing your own App using Face++ API!
