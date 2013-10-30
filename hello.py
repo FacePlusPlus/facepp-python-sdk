@@ -37,14 +37,13 @@ api = API(API_KEY, API_SECRET)
 
 # Here are the person names and their face images
 # 人名及其脸部图片
-IMAGE_DIR = \
-  'http://cn.faceplusplus.com/wp-content/themes/faceplusplus.zh/assets/img/demo/'
+IMAGE_DIR = 'http://cn.faceplusplus.com/static/resources/python_demo/'
 PERSONS = [
-    ('Jim Parsons', IMAGE_DIR + 'hello-0.jpg'),
-    ('Leonardo DiCaprio', IMAGE_DIR + 'hello-1.jpg'),
-    ('Andy Liu', IMAGE_DIR + 'hello-2.jpg')
+    ('Jim Parsons', IMAGE_DIR + '1.jpg'),
+    ('Leonardo DiCaprio', IMAGE_DIR + '2.jpg'),
+    ('Andy Liu', IMAGE_DIR + '3.jpg')
 ]
-TARGET_IMAGE = IMAGE_DIR + 'hello-t.jpg'
+TARGET_IMAGE = IMAGE_DIR + '4.jpg'
 
 # Step 1: Detect faces in the 3 pictures and find out their positions and
 # attributes
