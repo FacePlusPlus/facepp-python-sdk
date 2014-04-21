@@ -349,6 +349,7 @@ def _print_debug(msg):
 
 _APIS = [
   '/detection/detect',
+  '/detection/landmark',
   '/faceset/add_face',
   '/faceset/create',
   '/faceset/delete',
