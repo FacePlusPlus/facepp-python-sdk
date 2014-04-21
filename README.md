@@ -1,7 +1,6 @@
 # FacePlusPlus Python SDK
 
-This is the Face++ python SDK suite. Note that python3 has not been supported
-yet.
+This is the Face++ python SDK suite. Note that python2.7 is required.
 
 ## 1. cmdtool.py
 This is an interactive command line tool which could be used to experiment
